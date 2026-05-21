@@ -4,6 +4,8 @@ import { randomUUID } from 'crypto'
 import os from 'os'
 import { getFingerprint } from './fingerprint.js'
 
+// C:/Users/[username]/.cdg/device_id
+
 const getDeviceDir = () => join(os.homedir(), '.cdg')
 const getDevicePath = () => join(getDeviceDir(), 'device_id')
 
