@@ -1,44 +1,10 @@
 import { networkInterfaces } from 'os'
 import { execFileSync } from 'child_process'
+import { getRawSystemInfo } from './powershell.js'
+import { getFingerprint } from './fingerprint.js'
 import os from 'os'
 
 let _systemInfo = null
-let _rawSystemInfo = null
-
-const getAllSystemInfo = () => {
-	if (_rawSystemInfo) return _rawSystemInfo
-
-	try {
-		const script = `
-			$b = Get-WmiObject Win32_BaseBoard
-			$c = Get-WmiObject Win32_ComputerSystem
-			$p = Get-WmiObject Win32_Processor
-			$bios = Get-WmiObject Win32_BIOS
-			$os = Get-WmiObject Win32_OperatingSystem
-			$tz = Get-WmiObject Win32_TimeZone
-			[PSCustomObject]@{
-				boardSerial = $b.SerialNumber
-				cpuId = $p.ProcessorId
-				cpuName = $p.Name
-				cpuCores = $p.NumberOfCores
-				cpuThreads = $p.NumberOfLogicalProcessors
-				cpuMaxSpeed = $p.MaxClockSpeed
-				bios = $bios.SMBIOSBIOSVersion
-				systemManufacturer = $c.Manufacturer
-				systemModel = $c.Model
-				systemSerial = $c.SerialNumber
-				osVersion = $os.Caption
-				timezone = $tz.Caption
-			} | ConvertTo-Json
-		`
-		const encoded = Buffer.from(script, 'utf16le').toString('base64')
-		const result = execFileSync('powershell', ['-EncodedCommand', encoded], { encoding: 'utf-8' })
-		_rawSystemInfo = JSON.parse(result)
-		return _rawSystemInfo
-	} catch {
-		return {}
-	}
-}
 
 const getMac = () => {
 	const nets = networkInterfaces()
@@ -56,7 +22,7 @@ const getMac = () => {
 export const getSystemInfo = () => {
 	if (_systemInfo) return _systemInfo
 
-	const sys = getAllSystemInfo()
+	const sys = getRawSystemInfo()
 	_systemInfo = {
 		...sys,
 		hostname: os.hostname(),
