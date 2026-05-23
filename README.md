@@ -4,6 +4,7 @@ git push origin v1.0.1
 
 Використання в застосунку:
 npm install git+ssh://git@github.com/communication-design-group/cdg-device.git#v1.0.0
+yarn add git+ssh://git@github.com/communication-design-group/cdg-device.git#v1.0.0
 
 Або в package.json:
 "dependencies": {
@@ -12,3 +13,4 @@ npm install git+ssh://git@github.com/communication-design-group/cdg-device.git#v
 
 Оновлення до нової версії:
 npm install git+ssh://git@github.com/communication-design-group/cdg-device.git#v1.0.1
+yarn add git+ssh://git@github.com/communication-design-group/cdg-device.git#v1.0.1

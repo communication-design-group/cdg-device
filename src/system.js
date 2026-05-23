@@ -10,21 +10,27 @@ const getAllSystemInfo = () => {
 
 	try {
 		const script = `
-      $b = Get-WmiObject Win32_BaseBoard
-      $c = Get-WmiObject Win32_ComputerSystem
-      $p = Get-WmiObject Win32_Processor
-      $bios = Get-WmiObject Win32_BIOS
-      $os = Get-WmiObject Win32_OperatingSystem
-      [PSCustomObject]@{
-        boardSerial = $b.SerialNumber
-        cpuId = $p.ProcessorId
-        bios = $bios.SMBIOSBIOSVersion
-        systemManufacturer = $c.Manufacturer
-        systemModel = $c.Model
-        systemSerial = $c.SerialNumber
-        osVersion = $os.Caption
-      } | ConvertTo-Json
-    `
+			$b = Get-WmiObject Win32_BaseBoard
+			$c = Get-WmiObject Win32_ComputerSystem
+			$p = Get-WmiObject Win32_Processor
+			$bios = Get-WmiObject Win32_BIOS
+			$os = Get-WmiObject Win32_OperatingSystem
+			$tz = Get-WmiObject Win32_TimeZone
+			[PSCustomObject]@{
+				boardSerial = $b.SerialNumber
+				cpuId = $p.ProcessorId
+				cpuName = $p.Name
+				cpuCores = $p.NumberOfCores
+				cpuThreads = $p.NumberOfLogicalProcessors
+				cpuMaxSpeed = $p.MaxClockSpeed
+				bios = $bios.SMBIOSBIOSVersion
+				systemManufacturer = $c.Manufacturer
+				systemModel = $c.Model
+				systemSerial = $c.SerialNumber
+				osVersion = $os.Caption
+				timezone = $tz.Caption
+			} | ConvertTo-Json
+		`
 		const encoded = Buffer.from(script, 'utf16le').toString('base64')
 		const result = execFileSync('powershell', ['-EncodedCommand', encoded], { encoding: 'utf-8' })
 		_rawSystemInfo = JSON.parse(result)
@@ -56,7 +62,8 @@ export const getSystemInfo = () => {
 		hostname: os.hostname(),
 		platform: os.platform(),
 		username: os.userInfo().username,
-		mac: getMac()
+		mac: getMac(),
+		fingerprint: getFingerprint()
 	}
 
 	return _systemInfo
